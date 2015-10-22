@@ -1,0 +1,108 @@
+\documentclass[10pt]{article}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{ulem}
+\usepackage{framed}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{subfigure}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage[capitalise,noabbrev]{cleveref}
+\usepackage[usenames,dvipsnames]{xcolor}
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage[letterpaper, margin=1in]{geometry}
+
+
+\renewcommand{\familydefault}{ppl}
+
+\newcommand{\bx}{{\boldsymbol x}}
+\newcommand{\bw}{{\boldsymbol w}}
+\newcommand{\bmu}{{\boldsymbol \mu}}
+\newcommand{\bbeta}{{\boldsymbol \beta}}
+\newcommand{\btheta}{{\boldsymbol \theta}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\solution}[1]{{\color{PineGreen} \textbf{Solution:} #1}}
+
+\newcommand{\todo}[1]{\textbf{\textcolor{MidnightBlue}{to do: #1}} }
+
+\begin{document}
+\title{Resilience in Transportation Networks}
+\author{Yihui Ren,Saket Vishwasrao}
+\maketitle
+
+\section*{Problem Definition}
+Given a graph $G(V,E)$ and a set of paths $P=\{(s_1,t_1),(s_2,t_2),
+\dots,(s_k,t_k)\}$, where each $p_i \equiv (s_i,t_i) \in P$ represents the source and destination node for a path $p_i$,  
+find a set $E' \subseteq E$ consisting of all edges which when removed from the graph, maximum number of paths are affected. 
+Let a path be represented by an ordered list of edges $p_i=(e_1,e_2,\dots,e_j) $. 
+It is assumed that a path connecting the nodes $(s_i,t_i)$ is affected if atleast one of the edge $e\in p_i$ is attacked. 
+Also $p_i$ is the only path connecting the nodes $(s_i,t_i)$, and there is no other path connecting $(s_i,t_i)$.
+Further, $\sum_{e_i \in E'} b(e_i) \leq B$,where B is the budget of the adversary and $b(e_i)$ is the cost of removing edge $e_i$.
+
+\section*{Proposed Solution}
+
+Let us assume the graph has $n$ nodes and $m$ edges.\\\\
+We construct a $m \times 1$ matrix $\mathbf{C}$ such that $ith$ element in $\mathbf{C}$ represents the number of paths in set  $P$ passing through the $i^{th}$ edge.This can be found by iterating over all the paths in $P$.\\\\
+Let $\mathbf{b}$ be a $m \times 1$ matrix where $b_i$ represents the cost of removing the $i^{th}$ edge.\\\\
+Let $\mathbf{X}$ be a $m \times 1$ matrix such that $x_i=1$  if $i^{th}$ edge belongs to $E'$,otherwise it is 0.\\\\
+The solution to the above problem is equivalent to solving a linear program\\\\
+\begin{align}
+	\argmax_X \mathbf{C^T\cdot X}
+\end{align}
+\begin{center}such that $\mathbf{b^T\cdot X} \leq B$ and $x_i \in \{0,1\}$\end{center}
+
+which is equivalent to 
+
+\begin{align}
+	\argmin_X -\mathbf{C^T\cdot X}
+\end{align}
+\begin{center}such that $\mathbf{b^T\cdot X} \leq B$ and $x_i \in \{0,1\}$\end{center}
+
+\newpage
+
+\section*{Proposed solution 2}
+
+Let us assume the graph has $n$ nodes, $m$ edges and $k$ paths. Let each path $p_i \in P$ have a weight $w_i \in W$, where the weight represents the importance of the path.Thus if $w_i < w_j; w_i,w_j \in W$ implies that it is beneficial to destroy path $p_j$ over $p_i$.\\
+
+We create a $k \times m$ matrix $\mathbf{A}$ whose entry $a_{ij}=1$ if $e_j \in p_i$, else it is zero.\\
+
+Let $\mathbf{X'}$ represent the $m \times 1$ uint vector $\vec{1}$.\\
+
+Let $\mathbf{X}$ be a $m \times 1$ matrix such that $x_i=1$  if $e_i \in \mathbf{E'}$, otherwise it is 0.\\
+
+Let $\mathbf{W}$ be a vector such that each element $w_i\in \mathbf{W}$ represents weight of path $p_i$.\\
+
+Then the above problem is equivalent to solving a linear program
+
+\begin{align}
+	\argmax_X f\mathbf{\left(A\cdot \left(X'-X\right)\right)^{T}\cdot W}
+\end{align}
+\begin{center}such that $\mathbf{b^T\cdot X} \leq B$ and $x_i \in \{0,1\}$\end{center}
+
+where we define function $f$ for every element $z_i \in \mathbf{Z}$ in any vector $\mathbf{Z}$ as
+		$
+		f(z_i)=
+		\begin{cases}
+    		0,& \text{if } z_i =0\\
+    		 1,              & \text{otherwise}
+		\end{cases}
+		$
+
+Basically,$f\mathbf{\left(A\cdot \left(X'-X\right)\right)}$ is $k$ dimensional vector whose $i^{th}$ entry is 1 if the path $p_i \in P$ is affected.
+
+
+
+
+
+
+
+\end{document}
+
+
